@@ -3,9 +3,11 @@
 
 #include "ActCharacter.h"
 #include "SInteractionComponent.h"
+#include "SAttributeComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "DrawDebugHelpers.h"
 
 
@@ -22,6 +24,9 @@ AActCharacter::AActCharacter()
 	CameraComp->SetupAttachment(SpringArmComp);
 
 	InteractionComp = CreateDefaultSubobject<USInteractionComponent>("InteractionComp");
+
+	AttributeComp = CreateDefaultSubobject<USAttributeComponent>("AttributesComp");
+
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
 }
@@ -65,8 +70,32 @@ void AActCharacter::PrimaryAttack()
 void AActCharacter::PrimaryAttack_TimeElapsed()
 {
 	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+	
+	FMinimalViewInfo cameraView;
+	CameraComp->GetCameraView(0,cameraView);
+	FVector CameraLocation = cameraView.Location;
+	FVector TraceEnd = CameraLocation + GetControlRotation().Vector() * 1000;
+	FHitResult Hit;
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
 
-	FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
+	bool bHit = GetWorld()->LineTraceSingleByObjectType(Hit,CameraLocation,TraceEnd,ObjectQueryParams);
+	FVector Trace;
+	if(bHit)
+	{
+		Trace = Hit.Location;
+	}else
+	{
+		Trace = TraceEnd;
+	}
+
+
+	FRotator LookatRot = UKismetMathLibrary::FindLookAtRotation(HandLocation,Trace);
+
+
+	//FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
+	FTransform SpawnTM = FTransform(LookatRot, HandLocation);
 	//Spawn Particle
 	FActorSpawnParameters SpawnParameters;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
