@@ -34,6 +34,8 @@ public:
 	// Sets default values for this character's properties
 	AActCharacter();
 
+	virtual void PostInitializeComponents() override;
+
 protected:
 
 	UPROPERTY(VisibleAnywhere)
@@ -63,4 +65,6 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor,USAttributeComponent* OwningComp, float NewHealth, float Delta);
 };

@@ -31,11 +31,16 @@ AActCharacter::AActCharacter()
 	bUseControllerRotationYaw = false;
 }
 
+void AActCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	AttributeComp->OnHealthChanged.AddDynamic(this,&AActCharacter::OnHealthChanged);
+}
+
 // Called when the game starts or when spawned
 void AActCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void AActCharacter::MoveForward(float value)
@@ -150,5 +155,14 @@ void AActCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &AActCharacter::PrimaryAttack);
 
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &AActCharacter::PrimaryInteract);
+}
+
+void AActCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
+{
+	if(NewHealth <= 0 && Delta < 0.f)
+    {
+		APlayerController* PC = Cast<APlayerController>(GetController());
+		DisableInput(PC);
+    }
 }
 
