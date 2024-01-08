@@ -35,3 +35,9 @@
   - Composite tasks manage child tasks, and their behaviors depend on their children.
     - Selector: returns success if one of its children runs successfully, and returns failure if it ran out of children.
     - Sequence: returns failure if one of its children fails, and returns success if it runs out of children.
+
+- Custom BT service
+  - Unresolved Symbol BUG: Need to include Module in build.cs
+  - BT service updates Blackboard memory (can be used to check condition like attack range)
+  - Stop in attack range
+  - Line of sight check
