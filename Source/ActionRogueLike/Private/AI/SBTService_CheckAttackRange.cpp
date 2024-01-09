@@ -26,8 +26,13 @@ void USBTService_CheckAttackRange::TickNode(UBehaviorTreeComponent& OwnerComp, u
 					float distance = FVector::Distance(TargetActor->GetActorLocation(), BotPawn->GetActorLocation());
 
 					bool bWithinRange = distance < 1000.f;
+					bool bHasLos = false;
+					if(bWithinRange)
+					{
+						bHasLos = MyController->LineOfSightTo(TargetActor);
+					}
 
-					BlackBoardComp->SetValueAsBool(AttackRangeKey.SelectedKeyName, bWithinRange);
+					BlackBoardComp->SetValueAsBool(AttackRangeKey.SelectedKeyName, bWithinRange && bHasLos);
 
 				}
 			}
