@@ -10,8 +10,11 @@
 void ASAIController::BeginPlay()
 {
 	Super::BeginPlay();
-	RunBehaviorTree(BehaviorTree);
 
+	if(ensure(BehaviorTree), TEXT("Behavior tree net assigned in AI controller"))
+	{
+		RunBehaviorTree(BehaviorTree);
+	}
 	//used to access player for now
 	APawn* MyPawn = UGameplayStatics::GetPlayerPawn(this,0);
 	if(MyPawn)
